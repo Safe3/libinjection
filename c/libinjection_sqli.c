@@ -866,13 +866,13 @@ static size_t parse_word(struct libinjection_sqli_state * sf)
     size_t pos = sf->pos;
     size_t wlen = strlencspn(cs + pos, sf->slen - pos,
                              " {}<>:\\?=@!#~+-*/&|^%(),';\t\n\v\f\r\"\000");
-
+    size_t qlen =wlen<LIBINJECTION_SQLI_TOKEN_SIZE?wlen:(LIBINJECTION_SQLI_TOKEN_SIZE-1);
     st_assign(sf->current, TYPE_BAREWORD, pos, wlen, cs + pos);
 
     /* now we need to look inside what we good for "." and "`"
      * and see if what is before is a keyword or not
      */
-    for (i =0; i < sf->current->len; ++i) {
+    for (i =0; i < qlen; ++i) {
         delim = sf->current->val[i];
         if (delim == '.' || delim == '`') {
             ch = sf->lookup(sf, LOOKUP_WORD, sf->current->val, i);
